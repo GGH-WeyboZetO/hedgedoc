@@ -14,15 +14,11 @@ import { RevisionsService } from '../../revisions/revisions.service';
 import { RealtimeNote } from './realtime-note';
 import { RealtimeNoteStore } from './realtime-note-store';
 import { RealtimeNoteService } from './realtime-note.service';
-import { mockAwareness } from './test-utils/mock-awareness';
 import { mockRealtimeNote } from './test-utils/mock-realtime-note';
-import { mockWebsocketDoc } from './test-utils/mock-websocket-doc';
-import { WebsocketDoc } from './websocket-doc';
 
 describe('RealtimeNoteService', () => {
   const mockedContent = 'mockedContent';
   const mockedNoteId = 4711;
-  let websocketDoc: WebsocketDoc;
   let mockedNote: Note;
   let mockedRealtimeNote: RealtimeNote;
   let realtimeNoteService: RealtimeNoteService;
@@ -60,13 +56,8 @@ describe('RealtimeNoteService', () => {
     jest.resetAllMocks();
     jest.resetModules();
 
-    websocketDoc = mockWebsocketDoc();
     mockedNote = Mock.of<Note>({ id: mockedNoteId });
-    mockedRealtimeNote = mockRealtimeNote(
-      mockedNote,
-      websocketDoc,
-      mockAwareness(),
-    );
+    mockedRealtimeNote = mockRealtimeNote(mockedNote);
 
     revisionsService = Mock.of<RevisionsService>({
       getLatestRevision: jest.fn(),
@@ -199,7 +190,7 @@ describe('RealtimeNoteService', () => {
       .spyOn(realtimeNoteStore, 'create')
       .mockImplementation(() => mockedRealtimeNote);
     jest
-      .spyOn(websocketDoc, 'getCurrentContent')
+      .spyOn(mockedRealtimeNote, 'getCurrentContent')
       .mockReturnValue(mockedCurrentContent);
 
     await realtimeNoteService.getOrCreateRealtimeNote(mockedNote);

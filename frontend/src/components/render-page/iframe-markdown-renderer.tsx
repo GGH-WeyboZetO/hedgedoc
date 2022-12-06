@@ -171,7 +171,10 @@ export const IframeMarkdownRenderer: React.FC = () => {
     slideOptions
   ])
 
-  const extensionEventEmitter = useMemo(() => new EventEmitter2({ wildcard: true }), [])
+  const extensionEventEmitter = useMemo(
+    () => new EventEmitter2<Record<string, (values: unknown) => void>>({ wildcard: true }),
+    []
+  )
 
   useEffect(() => {
     extensionEventEmitter.onAny((event: string, values: unknown) => {

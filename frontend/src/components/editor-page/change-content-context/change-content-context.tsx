@@ -20,7 +20,7 @@ export type ContentFormatter = (parameters: {
 
 type ChangeEditorContentContext = [CodeMirrorReference, SetCodeMirrorReference]
 
-const changeEditorContentContext = createContext<ChangeEditorContentContext | undefined>(undefined)
+export const changeEditorContentContext = createContext<ChangeEditorContentContext | undefined>(undefined)
 
 /**
  * Extracts the {@link CodeMirrorReference code mirror reference} from the parent context.
