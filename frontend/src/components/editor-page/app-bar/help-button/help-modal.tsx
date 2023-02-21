@@ -48,7 +48,7 @@ export const HelpModal: React.FC<ModalVisibilityProps> = ({ show, onHide }) => {
   const modalTitle = useMemo(() => t('editor.documentBar.help') + ' - ' + t(`editor.help.${tab}`), [t, tab])
 
   return (
-    <CommonModal modalSize={'lg'} titleIcon={IconQuestionCircle} show={show} onHide={onHide} title={modalTitle}>
+    <CommonModal modalSize={'xl'} titleIcon={IconQuestionCircle} show={show} onHide={onHide} title={modalTitle}>
       <Modal.Body>
         <nav className='nav nav-tabs'>
           <Button

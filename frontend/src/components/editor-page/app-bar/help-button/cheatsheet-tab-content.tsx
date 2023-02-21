@@ -1,64 +1,53 @@
 /*
- * SPDX-FileCopyrightText: 2022 The HedgeDoc developers (see AUTHORS file)
+ * SPDX-FileCopyrightText: 2023 The HedgeDoc developers (see AUTHORS file)
  *
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-import { CheatsheetLine } from './cheatsheet-line'
-import styles from './cheatsheet.module.scss'
-import React, { useMemo, useState } from 'react'
-import { Table } from 'react-bootstrap'
-import { Trans, useTranslation } from 'react-i18next'
+import { optionalAppExtensions } from '../../../../extensions/extra-integrations/optional-app-extensions'
+import { ShowIf } from '../../../common/show-if/show-if'
+import type { CheatsheetEntry, CheatsheetExtension } from '../../cheatsheet/cheatsheet-extension'
+import { isCheatsheetGroup } from '../../cheatsheet/cheatsheet-extension'
+import { Categories } from './categories'
+import { CheatsheetRenderer } from './cheatsheet-renderer'
+import { EntrySelection } from './entry-selection'
+import React, { Fragment, useCallback, useMemo, useState } from 'react'
+import { Col, ListGroup, Row } from 'react-bootstrap'
 
-/**
- * Renders the content of the cheat sheet for the {@link HelpModal}.
- */
 export const CheatsheetTabContent: React.FC = () => {
-  const { t } = useTranslation()
-  const [checked, setChecked] = useState<boolean>(false)
-  const codes = useMemo(
-    () => [
-      `**${t('editor.editorToolbar.bold')}**`,
-      `*${t('editor.editorToolbar.italic')}*`,
-      `++${t('editor.editorToolbar.underline')}++`,
-      `~~${t('editor.editorToolbar.strikethrough')}~~`,
-      'H~2~O',
-      '19^th^',
-      `==${t('editor.help.cheatsheet.highlightedText')}==`,
-      `# ${t('editor.editorToolbar.header')}`,
-      `\`${t('editor.editorToolbar.code')}\``,
-      '```javascript=\nvar x = 5;\n```',
-      `> ${t('editor.editorToolbar.blockquote')}`,
-      `- ${t('editor.editorToolbar.unorderedList')}`,
-      `1. ${t('editor.editorToolbar.orderedList')}`,
-      `- [${checked ? 'x' : ' '}] ${t('editor.editorToolbar.checkList')}`,
-      `[${t('editor.editorToolbar.link')}](https://example.com)`,
-      `![${t('editor.editorToolbar.image')}](/icons/apple-touch-icon.png)`,
-      ':smile:',
-      ':bi-bootstrap:',
-      `:::info\n${t('editor.help.cheatsheet.exampleAlert')}\n:::`
-    ],
-    [checked, t]
+  const [selectedExtension, setSelectedExtension] = useState<CheatsheetExtension>()
+  const [selectedEntry, setSelectedEntry] = useState<CheatsheetEntry>()
+
+  const changeExtension = useCallback((value: CheatsheetExtension) => {
+    setSelectedExtension(value)
+    setSelectedEntry(isCheatsheetGroup(value) ? value.entries[0] : value)
+  }, [])
+
+  const extensions = useMemo(
+    () => optionalAppExtensions.flatMap((extension) => extension.buildCheatsheetExtensions()),
+    []
   )
 
   return (
-    <Table className={`table-condensed ${styles['table-cheatsheet']}`}>
-      <thead>
-        <tr>
-          <th>
-            <Trans i18nKey='editor.help.cheatsheet.example' />
-          </th>
-          <th>
-            <Trans i18nKey='editor.help.cheatsheet.syntax' />
-          </th>
-        </tr>
-      </thead>
-      <tbody>
-        {codes.map((code) => (
-          <CheatsheetLine markdown={code} key={code} onTaskCheckedChange={setChecked} />
-        ))}
-      </tbody>
-    </Table>
+    <Fragment>
+      <Row className={`mt-2`}>
+        <Col xs={3}>
+          <Categories extensions={extensions} selectedEntry={selectedExtension} onStateChange={changeExtension} />
+        </Col>
+        <Col xs={9}>
+          <ListGroup>
+            <EntrySelection
+              extension={selectedExtension}
+              selectedEntry={selectedEntry}
+              setSelectedEntry={setSelectedEntry}></EntrySelection>
+            <ShowIf condition={selectedEntry !== undefined}>
+              <CheatsheetRenderer
+                rootI18nKey={isCheatsheetGroup(selectedExtension) ? selectedExtension.i18nKey : undefined}
+                extension={selectedEntry as CheatsheetEntry}
+              />
+            </ShowIf>
+          </ListGroup>
+        </Col>
+      </Row>
+    </Fragment>
   )
 }
-
-export default CheatsheetTabContent

@@ -48,7 +48,7 @@ export const HistoryCard: React.FC<HistoryEntryProps & HistoryEventHandlers> = (
   const tags = useMemo(
     () =>
       entry.tags.map((tag) => (
-        <Badge className={'bg-dark me-1 mb-1'} key={tag}>
+        <Badge className={'bg-dark text-light me-1 mb-1'} key={tag}>
           {tag}
         </Badge>
       )),
@@ -73,7 +73,7 @@ export const HistoryCard: React.FC<HistoryEntryProps & HistoryEventHandlers> = (
                 {entryTitle}
               </Card.Title>
               <div>
-                <div className='text-black-50 mt-2'>
+                <div className='text-dark mt-2'>
                   <UiIcon icon={IconClock} /> {DateTime.fromISO(entry.lastVisitedAt).toRelative()}
                   <br />
                   {lastVisited}
